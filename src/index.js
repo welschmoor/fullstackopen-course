@@ -5,11 +5,12 @@ import App from './App';
 import App2 from './App2';
 import App3 from './App3';
 import App4 from './App4';
+import App5 from './Exercise26210.js';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <App4 />aw
+    <App5 />
   </React.StrictMode>,
   document.getElementById('root')
 );
