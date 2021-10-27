@@ -14,7 +14,7 @@ import App6 from './Exercise212.js';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App6 />
+    <App4 />
   </React.StrictMode>,
   document.getElementById('root')
 );

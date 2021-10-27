@@ -42,16 +42,24 @@ const App4 = () => {
     const filteredNotes = (showAll? notes : notes.filter(e => e.important)) //only show important notes
 
 
+    // adding new Note
     const submitHandler = (e) => {
+
+
         e.preventDefault()
-        setNotes([...notes, newNote])
-        console.log('submitted OK')
-        setNewNote({content: ''})
+
+        axios.post('http://localhost:3001/notes', newNote)
+        .then(res => {
+            console.log(res)
+            console.log('submitted OK')
+            setNewNote({content: ''})   // empty the input field
+            setNotes([...notes, newNote])
+        })
     }
 
     const inputHandler = (e) => {
         setNewNote({
-            id: notes.length+1,
+            id: notes.length+1,     // it is better to let server do the IDs
             content: e.target.value,
             important: Math.random() < 0.5,
             date: new Date().toISOString(),
