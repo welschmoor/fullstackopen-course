@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import noteService from './services/notes'  // has functions     getAll(), create(newObject), update(id, newObject)
+
 
 // const notelist = [
 //     {
@@ -28,11 +30,15 @@ const App4 = () => {
     const [showAll, setShowAll] = useState(true)
 
     useEffect(()=> {
-        axios.get('http://localhost:3001/notes').then(res=>{
-            console.log(res.data)
-            setNotes(res.data)
-          }).catch(error=> {console.log('kek:', error.message)})
+        let unsubBool = false
+        noteService.getAll().then(res=>{
+            console.log(res)
+            if (!unsubBool){
+                setNotes(res)
+            }
+        }).catch(error=> {console.log('kek:', error.message)})
 
+        return ()=> {unsubBool = true}
     },[])
 
       
@@ -44,16 +50,15 @@ const App4 = () => {
 
     // adding new Note
     const submitHandler = (e) => {
-
-
         e.preventDefault()
 
-        axios.post('http://localhost:3001/notes', newNote)
+        noteService.create(newNote)
         .then(res => {
             console.log(res)
+
             console.log('submitted OK')
             setNewNote({content: ''})   // empty the input field
-            setNotes([...notes, newNote])
+            setNotes([...notes, res])
         })
     }
 
@@ -71,13 +76,32 @@ const App4 = () => {
         setShowAll(p=>!p)
     }
 
+    // Changing note with axios PUT
+    const toggleImoprtance = (id) => {
+        console.log(`toggle ${id}`)
+        const url = `http://localhost:3001/notes/${id}`
+        const findNote = notes.find(e=> e.id === id)
+        const updatedNote = {...findNote, important: !findNote.important}
+        noteService.update(id, updatedNote)
+        .then(res=> {    // set state with updated note.
+            console.log('resdata', res)
+            setNotes(notes.map(e=> {
+                return e.id === id ?  res : e
+            }))
+        }).catch(error => {
+            alert(`the note ${findNote.content} was already deleted`)
+            setNotes(notes.filter(e => e.id !== id))
+        })
+        
+    }
+
 
     return (
         <div>
             <button type="button" onClick={btnHandler}>{showAll? 'displaying all' : 'displaying important'}</button>
             <ul>
                 {filteredNotes.map((each) => {
-                    return <li key={each.id}>{each.content}</li>
+                    return <li key={each.id}><button onClick={()=> toggleImoprtance(each.id)}>{each.important? "V": <>&nbsp;</>}</button> {each.content} </li>
                 })}
             </ul>
             <form onSubmit={submitHandler} name="form" >
