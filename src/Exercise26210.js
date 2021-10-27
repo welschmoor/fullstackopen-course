@@ -1,5 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
+import Searchinput from "./phoneComponents/Searchinput"
+import Form from "./phoneComponents/Form"
+import Personlist from "./phoneComponents/Personlist"
 
 const contacts = [
   { name: 'Arto Hellas', phone: '222-222-222' },
@@ -10,19 +14,34 @@ const contacts = [
 ]
 
 const App5 = () => {
-    const [persons, setPersons] = useState(contacts)
+    const [persons, setPersons] = useState([])
     const [newName, setNewName] = useState('')
     const [newPhone, setNewPhone] = useState('')
-    const [filter, setFilter] = useState('')
+    const [filter, setFilter] = useState('')  // only show contacts whose name .includes(filter) string
     
+
+    useEffect(()=> {
+      let unsub = false
+      
+      axios
+        .get('http://localhost:3001/persons')
+        .then(res => {
+            if (!unsub) {setPersons(res.data)}
+      })
+      
+      return () => {unsub = true}
+    },[])
+  
+
+
 
     const submitHandler = (e) => {
       e.preventDefault()
 
       // checking for duplicates
       let abort = false
-      persons.map(each => {
-        if (each.name.toLowerCase() === newName.toLowerCase()) abort = true;
+      persons.forEach(each => {
+        if (each.name.toLowerCase() === newName.toLowerCase()) {abort = true};
       })
       if (abort) {
         alert(`name ${newName} already exists!`)
@@ -31,7 +50,7 @@ const App5 = () => {
         return
       }
 
-      setPersons([...persons, {name: newName, phone: newPhone } ])
+      setPersons([...persons, {name: newName, number: newPhone } ])
       setNewName('')
       setNewPhone('')
     }
@@ -50,49 +69,15 @@ const App5 = () => {
 
     return (
     <center>
-        <h2>Phonebook</h2>
-        Search: <input input="text" placeholder="search contacts" onChange={searchInputHandler} />
-        <br />
-        <br />
-        <br />
-        <br />
-        <form onSubmit={submitHandler}>
-            <div>
-                name: <input value={newName} onChange={inputHandler} required/>
-            </div>
-            <div>
-                phone: <input value={newPhone} onChange={inputHandler2} required />
-            </div>
-            <div>
-                <button type="submit">add</button>
-            </div>
-        </form>
+        <h1>Phonebook</h1>
+        <Searchinput onChange={searchInputHandler} />
+        <h2>+Add contact</h2>
+        <Form sending={{submitHandler, newName, inputHandler, inputHandler2, newPhone}}/>
         <br/>
-        <br/>
-        <br/>
+    
         <h2>Numbers</h2>
-        <ul>
-        {!filter && persons.map(each=>{
-          return(
-            <li key={each.name}>
-              {each.name} {each.phone}
-            </li>
-          )
-        })}
 
-        {
-        filter && persons.filter(each=> {
-          if (each.name.toLowerCase().includes(filter.toLowerCase())) return true
-        }).map(each=>{
-          return(
-            <li key={each.name}>
-              {each.name} {each.phone}
-            </li>
-          )
-        })
-        }
-
-        </ul>
+        <Personlist sending={{filter, persons}}/>
 
     </center>
     )

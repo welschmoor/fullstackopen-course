@@ -1,31 +1,42 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
-
-const notelist = [
-    {
-      id: 1,
-      content: 'HTML is easy',
-      date: '2019-05-30T17:30:31.098Z',
-      important: true
-    },
-    {
-      id: 2,
-      content: 'Browser can execute only JavaScript',
-      date: '2019-05-30T18:39:34.091Z',
-      important: false
-    },
-    {
-      id: 3,
-      content: 'GET and POST are the most important methods of HTTP protocol',
-      date: '2019-05-30T19:20:14.298Z',
-      important: true
-    }
-  ]
+// const notelist = [
+//     {
+//       id: 1,
+//       content: 'HTML is easy',
+//       date: '2019-05-30T17:30:31.098Z',
+//       important: true
+//     },
+//     {
+//       id: 2,
+//       content: 'Browser can execute only JavaScript',
+//       date: '2019-05-30T18:39:34.091Z',
+//       important: false
+//     },
+//     {
+//       id: 3,
+//       content: 'GET and POST are the most important methods of HTTP protocol',
+//       date: '2019-05-30T19:20:14.298Z',
+//       important: true
+//     }
+//   ]
 
 const App4 = () => {
-    const [notes, setNotes] = useState(notelist)
+    const [notes, setNotes] = useState([])
     const [newNote, setNewNote] = useState({})
     const [showAll, setShowAll] = useState(true)
+
+    useEffect(()=> {
+        axios.get('http://localhost:3001/notes').then(res=>{
+            console.log(res.data)
+            setNotes(res.data)
+          }).catch(error=> {console.log('kek:', error.message)})
+
+    },[])
+
+      
+      
 
 
     const filteredNotes = (showAll? notes : notes.filter(e => e.important)) //only show important notes
