@@ -1,5 +1,5 @@
 {
-    "printWidth": 9999,
+    "printWidth": 100,
     "trailingComma": "es5",
     "tabWidth": 3,
     "semi": false,
